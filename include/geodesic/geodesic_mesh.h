@@ -274,7 +274,7 @@ Mesh::build_adjacencies()
             }
 
             double angle = std::acos(cos_from_edges(abc[0], abc[1], abc[2]));
-            assert(angle > 1e-5); // algorithm works well with non-degenerate meshes only
+            // assert(angle > 1e-5); // algorithm works well with non-degenerate meshes only
 
             f.corner_angles()[j] = angle;
             sum += angle;
@@ -321,7 +321,7 @@ Mesh::verify() // verifies connectivity of the mesh and prints some debug info
         map[e->adjacent_vertices()[0]->id()] = true;
         map[e->adjacent_vertices()[1]->id()] = true;
     }
-    assert(std::find(map.begin(), map.end(), false) == map.end());
+    // assert(std::find(map.begin(), map.end(), false) == map.end());
 
     // make sure that the mesh is connected trough its edges
     // if mesh has more than one connected component, it is most likely a bug
@@ -345,7 +345,7 @@ Mesh::verify() // verifies connectivity of the mesh and prints some debug info
             }
         }
     }
-    assert(std::find(map.begin(), map.end(), false) == map.end());
+    // assert(std::find(map.begin(), map.end(), false) == map.end());
 
     // print some mesh statistics that can be useful in debugging
     std::cout << "mesh has " << m_vertices.size() << " vertices, " << m_faces.size() << " faces, "

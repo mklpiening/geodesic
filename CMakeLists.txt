@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11.0)
+cmake_minimum_required(VERSION 3.10.0)
 project(geodesic)
 
 find_package(Git REQUIRED)
@@ -17,7 +17,7 @@ add_definitions(-DGEODESIC_VERSION="${GEODESIC_VERSION}")
 
 set(CMAKE_CXX_STANDARD 11)
 
-OPTION(BUILD_TESTS "Set when you want to build the tests" ON)
+OPTION(BUILD_TESTS "Set when you want to build the tests" OFF)
 OPTION(PYTHON_BINDING "Set when you want to build PYTHON_BINDING (Python bindings for the library)" ON)
 
 #################################################################################
@@ -38,59 +38,6 @@ target_sources(geodesic_interface INTERFACE
 )
 install(FILES $<TARGET_PROPERTY:geodesic_interface,INTERFACE_SOURCES> DESTINATION include)
 
-#################################################################################
-# TESTS
-#################################################################################
-IF(BUILD_TESTS)
-    include(FetchContent)
-
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY "https://github.com/google/googletest"
-        GIT_TAG        release-1.8.1
-    )
-
-    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
-    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-    FetchContent_GetProperties(googletest)
-    if(NOT googletest_POPULATED)
-        FetchContent_Populate(googletest)
-        add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
-    endif()
-
-    add_executable(unit_tests tests/test_geodesic_algorithm.cpp)
-    target_link_libraries(unit_tests geodesic_interface gtest gtest_main)
-
-    configure_file(examples/flat_triangular_mesh.txt ${CMAKE_CURRENT_BINARY_DIR}/flat_triangular_mesh.txt COPYONLY)
-    configure_file(examples/hedgehog_mesh.txt ${CMAKE_CURRENT_BINARY_DIR}/hedgehog_mesh.txt COPYONLY)
-    
-ENDIF(BUILD_TESTS)
-#################################################################################
-# PYTHON BINDING
-#################################################################################
-IF(PYTHON_BINDING)
-    include(FetchContent)
-    FetchContent_Declare(
-        pybind11
-        GIT_REPOSITORY https://github.com/pybind/pybind11
-        GIT_TAG v2.2.4
-    )
-
-    FetchContent_GetProperties(pybind11)
-    if(NOT pybind11_POPULATED)
-        FetchContent_Populate(pybind11)
-        add_subdirectory(${pybind11_SOURCE_DIR} ${pybind11_BINARY_DIR})
-    endif()
-
-    pybind11_add_module(geodesic python/geodesic.cpp)
-    target_link_libraries(geodesic LINK_PUBLIC geodesic_interface)
-
-    install(TARGETS geodesic LIBRARY DESTINATION python)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/example.py DESTINATION python)
-    install(FILES examples/flat_triangular_mesh.txt DESTINATION python)
-ENDIF(PYTHON_BINDING)
 #################################################################################
 # EXAMPLES
 #################################################################################
